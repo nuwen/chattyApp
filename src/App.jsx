@@ -8,7 +8,16 @@ class App extends Component {
         super(props);
         this.state = {
             currentUser: {name: 'Bob'},
-            messages: [],
+            messages: [
+              {
+                username: "Bob",
+                content: "Has anyone seen my marbles?",
+              },
+              {
+                username: 'Anonymous',
+                content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
+              }
+            ]
 
         };
     }
@@ -23,7 +32,7 @@ class App extends Component {
                 </nav>
                 <main className="messages"></main>
                 <Message />
-                <ChatBar />
+                <ChatBar name={this.state.currentUser.name}/>
             </div>
         );
     }
