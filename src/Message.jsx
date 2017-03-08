@@ -7,7 +7,7 @@ class Message extends Component {
 
     return (
       <div className="message system">
-        Anonymous1 changed their name to nomnom.
+        {this.props.lastName} changed their name to {this.props.newName}.
       </div>
     );
   }

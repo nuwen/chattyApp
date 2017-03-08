@@ -2,24 +2,36 @@ import React, {Component} from 'react';
 
 class MessageList extends Component {
 
-    render() {
-        console.log('Rendering <MessageList/>');
+  render() {
+    console.log('Rendering <MessageList/>');
 
-        return (
-          <ol>
-            {this.props.messages.map((message => {
-              console.log(message.username);
+    return (
+      <div>
+        {this.props.messages.map((message => {
+
+            if(message.type == 'postNotification') {
+
               return (
                 <div className="message" key={message.id}>
-                <span className="message-username">{message.username}</span>
-                <span className="message-content">{message.content}</span>
+                  <div className="message system">
+                  <span className="message-content">{message.content}</span>
+                  </div>
                 </div>
               );
 
-            }))}
-          </ol>
+            } else {
 
-        );
-    }
+              return(
+                <div className="message" key={message.id}>
+                  <span className="message-username">{message.username || 'Anonymous'}</span>
+                  <span className="message-content">{message.content}</span>
+                </div>
+              );
+            }
+          }))}
+        </div>
+
+    );
+  }
 }
 export default MessageList;
