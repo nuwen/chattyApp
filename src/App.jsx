@@ -67,7 +67,6 @@ class App extends Component {
       }
       const messages = this.state.messages.concat(notification);
 
-
       this.setState({
           currentUser: {name: newName},
           messages: messages
