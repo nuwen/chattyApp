@@ -19,6 +19,12 @@ const wss = new SocketServer({ server });
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
  let numberConnections = 0;
+ let usersColor = {};
+
+ function colorGenerator() {
+   return '#'+Math.floor(Math.random()*16777215).toString(16);
+ }
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
@@ -27,19 +33,37 @@ wss.on('connection', (ws) => {
   wss.clients.forEach(function each(client) {
     let outgoingCount = {type: 'incomingCount', count: numberConnections};
     client.send(JSON.stringify(outgoingCount));
+    let userColor = {type: 'userColor', userID: uuid.v4(), color: colorGenerator()};
+    client.send(JSON.stringify(userColor));
   })
 
 
   ws.on('message', function incoming(data){
     let parsedData = JSON.parse(data);
+    let outgoingMessage;
     console.log(parsedData);
 
-    let outgoingMessage = {
-      id: uuid.v4(),
-      type: parsedData.type == 'postMessage' ? 'incomingMessage' : 'incomingNotification',
-      content: parsedData.content,
-      username: parsedData.username
+    switch(parsedData.type){
+
+      case 'postMessage':
+        outgoingMessage={
+          id: uuid.v4(),
+          type: 'incomingMessage',
+          content: parsedData.content,
+          username: parsedData.username
+        }
+        break;
+
+      case 'postNotification':
+        outgoingMessage={
+          id: uuid.v4(),
+          type: 'incomingNotification',
+          content: parsedData.content,
+          username: parsedData.username
+        }
+        break;
     }
+
     console.log(outgoingMessage);
     wss.clients.forEach(function each(client) {
       client.send(JSON.stringify(outgoingMessage));
