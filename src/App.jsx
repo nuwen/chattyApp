@@ -3,82 +3,82 @@ import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 import Message from './Message.jsx';
 
+
 class App extends Component {
     constructor() {
         super();
+        this.socket = null;
         this.state = {
+            user: '',
+            color: '',
+            count: 0,
             currentUser: {name: ''},
-            messages: [
-              // {
-              //   id: 1,
-              //   username: "Bob",
-              //   content: "Has anyone seen my marbles?",
-              // },
-              // {
-              //   id: 2,
-              //   username: 'Anonymous',
-              //   content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
-              // }
-            ]
+            messages: []
         };
     }
-  // componentDidMount() {
-  //   console.log("componentDidMount <App />");
-  //   setTimeout(() => {
-  //     console.log("Simulating incoming message");
-  //
-  //     // Add a new message to the list of messages in the data store
-  //
-  //     const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
-  //     const messages = this.state.messages.concat(newMessage)
-  //
-  //     // Update the state of the app component.
-  //     // Calling setState will trigger a call to render() in App and all child components.
-  //
-  //     this.setState({messages: messages})
-  //   }, 3000);
-  // }
+  componentDidMount() {
+    console.log("componentDidMount <App />");
+
+    this.socket = new WebSocket("ws://localhost:3001");
+    this.socket.onopen = function(event){
+      console.log("Noww i've connected to the server");
+    }
 
 
-  newMessage(event) {
+
+    this.socket.onmessage = (event) => {
+      let parsedData = JSON.parse(event.data);
+      const messages = this.state.messages.concat(parsedData);
+
+      switch(parsedData.type){
+
+        case 'incomingMessage':
+          this.setState({messages: messages});
+          break;
+
+        case 'incomingNotification':
+            this.setState({messages: messages});
+          break;
+
+        case 'incomingCount':
+          this.setState({count: parsedData.count});
+          break;
+
+        case 'userColor':
+          this.setState({user: parsedData.userID, color: parsedData.color});
+          break
+      }
+    }
+
+
+  }
+
+
+  addMessage(event) {
     if(event.key === 'Enter' && event.target.value != '') {
-
       const message = {
-        id: this.state.messages.length + 1,
         type: 'postMessage',
         content: event.target.value,
         username: this.state.currentUser.name,
       };
-      const messages = this.state.messages.concat(message);
-
-      this.setState({messages: messages})
+      this.socket.send(JSON.stringify(message));
       event.target.value = '';
-      // this.socket.send(JSON.stringify(message))
     }
+
   }
   nameChange(event) {
-    if(event.key === "Enter") {
+    if(event.type == 'blur' || event.key == "Enter") {
       const lastName = this.state.currentUser.name;
       const newName = event.target.value;
       const notification = {
-        id: this.state.messages.length + 1,
-        type: "postNotification",
+        type: 'postNotification',
         content: `${lastName || "Anonymous"} changed their name to ${newName || "Anonymous"}`,
       }
-      const messages = this.state.messages.concat(notification);
-
-      this.setState({
-          currentUser: {name: newName},
-          messages: messages
-          });
-      }
-      // this.socket.send(JSON.stringify(notification));
+      this.socket.send(JSON.stringify(notification));
+      this.setState({currentUser: {name: newName}});
+    }
   }
 
-  //
-  // userCountChanged(data){
-  //   this.setState({userCount: data.userCount});
-  // }
 
 
 
@@ -87,18 +87,20 @@ class App extends Component {
             <div>
                 <nav className="navbar">
                     <a href="/" className="navbar-brand">Chatty</a>
-                    <span id="user-counter"> 0 users online</span>
+                    <div className="navbar-user-counter"> {this.state.count} users online</div>
                 </nav>
                 <main className="messages">
 
 
 
-                <MessageList messages={this.state.messages} />
+                <MessageList
+                  messages={this.state.messages}
+                  color={this.state.color}/>
                 </main>
                 <ChatBar
                   nameChange={this.nameChange.bind(this)}
                   currentUser={this.state.currentUser.name}
-                  newMessage={this.newMessage.bind(this)}/>
+                  addMessage={this.addMessage.bind(this)}/>
             </div>
         );
     }

@@ -4,12 +4,11 @@ class MessageList extends Component {
 
   render() {
     console.log('Rendering <MessageList/>');
-
     return (
       <div>
         {this.props.messages.map((message => {
-
-            if(message.type == 'postNotification') {
+          console.log(this.props.color);
+            if(message.type == 'incomingNotification') {
 
               return (
                 <div className="message" key={message.id}>
@@ -23,7 +22,7 @@ class MessageList extends Component {
 
               return(
                 <div className="message" key={message.id}>
-                  <span className="message-username">{message.username || 'Anonymous'}</span>
+                  <span className="message-username" style= {{color: this.props.color}}>{message.username || 'Anonymous'}</span>
                   <span className="message-content">{message.content}</span>
                 </div>
               );

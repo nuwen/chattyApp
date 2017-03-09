@@ -2,12 +2,6 @@ import React, {Component} from 'react';
 
 class ChatBar extends Component {
 
-  // constructor(props) {
-  //   super(props)
-  //   this.state = {
-  //     currentUser: {name: ''}
-  //   }
-  // }
 
     render() {
         console.log('Rendering <ChatBar/>');
@@ -18,13 +12,13 @@ class ChatBar extends Component {
                   type='text'
                   className="chatbar-username"
                   placeholder="Your Name (Optional)"
+                  // onBlur={this.props.nameChange}
                   onKeyUp={this.props.nameChange}
-                  defaultValue={this.props.currentUser} />
+                  defaultValue='' />
                 <input
                   className="chatbar-message"
                   placeholder="Type a message and hit ENTER"
-                  // onKeyUp={props.addMessage}
-                  onKeyUp={this.props.newMessage} />
+                  onKeyUp={this.props.addMessage} />
             </footer>
         );
     }
