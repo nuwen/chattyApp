@@ -26,7 +26,7 @@ wss.on('connection', (ws) => {
 
     let outgoingMessage = {
       id: uuid.v4(),
-      type: parsedData.type,
+      type: parsedData.type == 'postMessage' ? 'incomingMessage' : 'incomingNotification',
       content: parsedData.content,
       username: parsedData.username
     }
