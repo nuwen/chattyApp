@@ -1,5 +1,5 @@
 // server.js
-
+const uuid = require('node-uuid');
 const express = require('express');
 const SocketServer = require('ws').Server;
 
@@ -13,20 +13,27 @@ const server = express()
   .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${ PORT }`));
 
 // Create the WebSockets server
-const ws = new SocketServer({ server });
+const wss = new SocketServer({ server });
 
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-ws.on('connection', (ws) => {
+wss.on('connection', (ws) => {
   console.log('Client connected');
 
-  ws.on('open', function open() {
-    ws.send('woohoo');
-  });
+  ws.on('message', function incoming(data){
+    let parsedData = JSON.parse(data);
 
-  ws.on('message', function incoming(data, flags) {
-    console.log(data);
+    let outgoingMessage = {
+      id: uuid.v4(),
+      type: parsedData.type,
+      content: parsedData.content,
+      username: parsedData.username
+    }
+    wss.clients.forEach(function each(client) {
+      client.send(JSON.stringify(outgoingMessage));
+    })
+    console.log(outgoingMessage);
   });
 
 
