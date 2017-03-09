@@ -9,7 +9,7 @@ class App extends Component {
         super();
         this.socket = null;
         this.state = {
-            user: '',
+            userID: '',
             color: '',
             count: 0,
             currentUser: {name: ''},
@@ -28,15 +28,18 @@ class App extends Component {
 
     this.socket.onmessage = (event) => {
       let parsedData = JSON.parse(event.data);
-      const messages = this.state.messages.concat(parsedData);
+      let messages;
 
       switch(parsedData.type){
 
         case 'incomingMessage':
+
+          messages = this.state.messages.concat(parsedData);
           this.setState({messages: messages});
           break;
 
         case 'incomingNotification':
+            messages = this.state.messages.concat(parsedData);
             this.setState({messages: messages});
           break;
 
@@ -45,7 +48,7 @@ class App extends Component {
           break;
 
         case 'userColor':
-          this.setState({user: parsedData.userID, color: parsedData.color});
+          this.setState({userID: parsedData.userID});
           break
       }
     }
@@ -60,6 +63,7 @@ class App extends Component {
         type: 'postMessage',
         content: event.target.value,
         username: this.state.currentUser.name,
+        userID: this.state.userID
       };
       this.socket.send(JSON.stringify(message));
       event.target.value = '';
@@ -95,7 +99,7 @@ class App extends Component {
 
                 <MessageList
                   messages={this.state.messages}
-                  color={this.state.color}/>
+                />
                 </main>
                 <ChatBar
                   nameChange={this.nameChange.bind(this)}

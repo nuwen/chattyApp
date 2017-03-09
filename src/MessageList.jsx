@@ -7,7 +7,6 @@ class MessageList extends Component {
     return (
       <div>
         {this.props.messages.map((message => {
-          console.log(this.props.color);
             if(message.type == 'incomingNotification') {
 
               return (
@@ -22,7 +21,7 @@ class MessageList extends Component {
 
               return(
                 <div className="message" key={message.id}>
-                  <span className="message-username" style= {{color: this.props.color}}>{message.username || 'Anonymous'}</span>
+                  <span className="message-username" style= {{color: message.color}}>{message.username || 'Anonymous'}</span>
                   <span className="message-content">{message.content}</span>
                 </div>
               );

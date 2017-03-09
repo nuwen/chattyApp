@@ -1,3 +1,5 @@
+
+
 // server.js
 const uuid = require('node-uuid');
 const express = require('express');
@@ -19,29 +21,48 @@ const wss = new SocketServer({ server });
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
  let numberConnections = 0;
- let usersColor = {};
+ let userColorDB = {};
+
 
  function colorGenerator() {
    return '#'+Math.floor(Math.random()*16777215).toString(16);
  }
+
+ // function urlDetector(string){
+ //   let splitString = string.split(' ');
+ //   splitString.forEach((word) => {
+ //     if( word.endsWith('gif') || word.endsWith('jpeg')  || word.endsWith('png')){
+ //     console.log('detected');
+ //   }
+ // });
+ // }
+ //
+
+
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
   numberConnections = numberConnections + 1;
 
+  let userColor = {type: 'userColor', userID: uuid.v4(), color: colorGenerator()};
+  userColorDB[userColor.userID] = {color: userColor.color};
+  console.log(userColorDB);
+
+  // userColor.push({userID: userColor.userID, color: userColor.color});
+
+  ws.send(JSON.stringify(userColor));
+
+
   wss.clients.forEach(function each(client) {
     let outgoingCount = {type: 'incomingCount', count: numberConnections};
     client.send(JSON.stringify(outgoingCount));
-    let userColor = {type: 'userColor', userID: uuid.v4(), color: colorGenerator()};
-    client.send(JSON.stringify(userColor));
   })
 
 
   ws.on('message', function incoming(data){
     let parsedData = JSON.parse(data);
     let outgoingMessage;
-    console.log(parsedData);
 
     switch(parsedData.type){
 
@@ -50,8 +71,11 @@ wss.on('connection', (ws) => {
           id: uuid.v4(),
           type: 'incomingMessage',
           content: parsedData.content,
-          username: parsedData.username
+          username: parsedData.username,
+          color: userColorDB[parsedData.userID].color
         }
+        console.log(parsedData);
+        console.log(outgoingMessage);
         break;
 
       case 'postNotification':
@@ -64,7 +88,6 @@ wss.on('connection', (ws) => {
         break;
     }
 
-    console.log(outgoingMessage);
     wss.clients.forEach(function each(client) {
       client.send(JSON.stringify(outgoingMessage));
     })
