@@ -10,7 +10,6 @@ class App extends Component {
         this.socket = null;
         this.state = {
             userID: '',
-            color: '',
             count: 0,
             currentUser: {name: ''},
             messages: []
@@ -51,6 +50,10 @@ class App extends Component {
           this.setState({userID: parsedData.userID});
           break
       }
+    }
+
+    this.socket.onclose = (event) => {
+     console.log('closed connection');
     }
 
 

@@ -28,15 +28,9 @@ const wss = new SocketServer({ server });
    return '#'+Math.floor(Math.random()*16777215).toString(16);
  }
 
- // function urlDetector(string){
- //   let splitString = string.split(' ');
- //   splitString.forEach((word) => {
- //     if( word.endsWith('gif') || word.endsWith('jpeg')  || word.endsWith('png')){
- //     console.log('detected');
- //   }
- // });
- // }
- //
+
+
+ // replaceAsElement = '<img style="width: 60%; height: 60%" src="' + word + '">';
 
 
 
@@ -74,7 +68,7 @@ wss.on('connection', (ws) => {
           username: parsedData.username,
           color: userColorDB[parsedData.userID].color
         }
-        console.log(parsedData);
+        console.log(parsedData.type)
         console.log(outgoingMessage);
         break;
 
